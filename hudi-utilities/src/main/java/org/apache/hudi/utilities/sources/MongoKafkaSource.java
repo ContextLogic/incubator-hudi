@@ -23,6 +23,7 @@ import org.apache.hudi.common.util.TypedProperties;
 import org.apache.hudi.utilities.schema.SchemaProvider;
 import org.apache.hudi.utilities.sources.helpers.KafkaOffsetGen;
 import org.apache.hudi.utilities.sources.helpers.KafkaOffsetGen.CheckpointUtils;
+import org.apache.hudi.utilities.sources.helpers.KafkaAvroConverter;
 import org.apache.hudi.utilities.sources.helpers.MongoAvroConverter;
 
 import org.apache.avro.generic.GenericRecord;
@@ -64,9 +65,9 @@ public class MongoKafkaSource extends AvroSource {
   }
 
   private JavaRDD<GenericRecord> toRDD(OffsetRange[] offsetRanges) {
-    final MongoAvroConverter converter = new MongoAvroConverter(schemaProvider.getSourceSchema());
+    final KafkaAvroConverter converter = new MongoAvroConverter(schemaProvider.getSourceSchema());
     return KafkaUtils.createRDD(sparkContext, offsetGen.getKafkaParams(), offsetRanges,
-            LocationStrategies.PreferConsistent()).map(obj -> converter.transform((String)obj.key(), (String)obj.value()));
+            LocationStrategies.PreferConsistent()).mapPartitions(records -> converter.apply(records));
   }
 }
 
