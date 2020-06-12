@@ -1,5 +1,6 @@
 package org.apache.hudi.utilities.sources.helpers;
 
+import java.io.Serializable;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.Spliterator;
@@ -13,7 +14,7 @@ import org.apache.kafka.clients.consumer.ConsumerRecord;
 /**
  * Convert a list of Kafka ConsumerRecord<String, String> to GenericRecord.
  */
-public abstract class KafkaAvroConverter {
+public abstract class KafkaAvroConverter implements Serializable {
   // Use GenericRecord as schema wrapper to leverage Spark Kyro serialization.
   private final GenericRecord schemaHolder;
 

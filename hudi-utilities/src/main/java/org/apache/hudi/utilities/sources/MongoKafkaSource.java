@@ -67,7 +67,7 @@ public class MongoKafkaSource extends AvroSource {
   private JavaRDD<GenericRecord> toRDD(OffsetRange[] offsetRanges) {
     final KafkaAvroConverter converter = new MongoAvroConverter(schemaProvider.getSourceSchema());
     return KafkaUtils.createRDD(sparkContext, offsetGen.getKafkaParams(), offsetRanges,
-            LocationStrategies.PreferConsistent()).mapPartitions(records -> converter.apply(records));
+            LocationStrategies.PreferConsistent()).mapPartitions(converter::apply);
   }
 }
 
