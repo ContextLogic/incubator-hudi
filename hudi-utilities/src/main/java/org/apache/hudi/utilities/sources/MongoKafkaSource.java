@@ -41,7 +41,7 @@ public class MongoKafkaSource extends AvroSource {
 
   private static final Logger LOG = LogManager.getLogger(MongoKafkaSource.class);
     
-  private final KafkaOffsetGen offsetGen;
+  private final volatile KafkaOffsetGen offsetGen;
     
   private final SchemaProvider schemaProvider;
 
@@ -59,15 +59,20 @@ public class MongoKafkaSource extends AvroSource {
     long totalNewMsgs = CheckpointUtils.totalNewMessages(offsetRanges);
     if (totalNewMsgs <= 0) {
       return new InputBatch<>(Option.empty(), lastCheckpointStr.isPresent() ? lastCheckpointStr.get() : "");
+    } else {
+      LOG.warn("About to read " + totalNewMsgs + " from Kafka for topic :" + offsetGen.getTopicName());
     }
     JavaRDD<GenericRecord> newDataRDD = toRDD(offsetRanges);
     return new InputBatch<>(Option.of(newDataRDD), CheckpointUtils.offsetsToStr(offsetRanges));
   }
 
   private JavaRDD<GenericRecord> toRDD(OffsetRange[] offsetRanges) {
-    final KafkaAvroConverter converter = new MongoAvroConverter(schemaProvider.getSourceSchema());
     return KafkaUtils.createRDD(sparkContext, offsetGen.getKafkaParams(), offsetRanges,
-            LocationStrategies.PreferConsistent()).mapPartitions(records -> converter.apply(records));
+            LocationStrategies.PreferConsistent()).mapPartitions(records -> {
+	      //KafkaAvroConverter can't be serialized if defined outside
+              KafkaAvroConverter converter = new MongoAvroConverter(schemaProvider.getSourceSchema());
+              return converter.apply(records);
+            });
   }
 }
 
