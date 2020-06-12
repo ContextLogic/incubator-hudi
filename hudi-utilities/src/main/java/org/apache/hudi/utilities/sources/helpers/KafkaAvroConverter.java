@@ -13,7 +13,7 @@ import org.apache.kafka.clients.consumer.ConsumerRecord;
 /**
  * Convert a list of Kafka ConsumerRecord<String, String> to GenericRecord.
  */
-public abstract class KafkaAvroConverter implements Serializable {
+public abstract class KafkaAvroConverter {
   // Use GenericRecord as schema wrapper to leverage Spark Kyro serialization.
   private final GenericRecord schemaHolder;
 
