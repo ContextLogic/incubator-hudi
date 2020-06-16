@@ -19,13 +19,16 @@ import org.apache.spark.sql.types.StructType;
 public abstract class KafkaAvroConverter implements Serializable {
   // Use GenericRecord as schema wrapper to leverage Spark Kyro serialization.
   
-  private final StructType schemaHolder;
-  public KafkaAvroConverter(StructType dataType) {
-    schemaHolder = dataType;
+  private final StructType avroSchema;
+  private final String structName;
+
+  public KafkaAvroConverter(StructType schema, String name) {
+    avroSchema = schema;
+    structName = name;
   }
 
   public Schema getSchema() {
-    return AvroConversionUtils.convertStructTypeToAvroSchema(schemaHolder, "oplog", "hoodie.oplog");
+    return AvroConversionUtils.convertStructTypeToAvroSchema(avroSchema, structName, "hudi." + structName);
   }
 
   public Iterator<GenericRecord> apply(Iterator<ConsumerRecord<Object, Object>> records) {

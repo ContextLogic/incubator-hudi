@@ -181,10 +181,13 @@ public class KafkaOffsetGen {
 
       // Determine the offset ranges to read from
       if (lastCheckpointStr.isPresent()) {
+        LOG.info("Get Kafka offsets via hudi checkpoint");
         fromOffsets = checkupValidOffsets(consumer, lastCheckpointStr, topicPartitions);
       } else {
         KafkaResetOffsetStrategies autoResetValue = KafkaResetOffsetStrategies
                 .valueOf(props.getString("auto.offset.reset", Config.DEFAULT_AUTO_RESET_OFFSET.toString()).toUpperCase());
+        LOG.info("Get Kafka offsets via KafkaConsumer");
+
         switch (autoResetValue) {
           case EARLIEST:
             fromOffsets = consumer.beginningOffsets(topicPartitions);
@@ -201,6 +204,13 @@ public class KafkaOffsetGen {
       toOffsets = consumer.endOffsets(topicPartitions);
     }
 
+    fromOffsets.entrySet().forEach(entry -> {
+      LOG.debug("fromOffsets: " + entry.getKey().topic() + "-" + entry.getKey().partition() + " -> " + entry.getValue());
+    });
+
+    toOffsets.entrySet().forEach(entry -> {
+      LOG.debug("toOffsets: " + entry.getKey().topic() + "-" + entry.getKey().partition() + " -> " + entry.getValue());
+    });
     // Come up with final set of OffsetRanges to read (account for new partitions, limit number of events)
     long maxEventsToReadFromKafka = props.getLong(Config.MAX_EVENTS_FROM_KAFKA_SOURCE_PROP,
         Config.maxEventsFromKafkaSource);

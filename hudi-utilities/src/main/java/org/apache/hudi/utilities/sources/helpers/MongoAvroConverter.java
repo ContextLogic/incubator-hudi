@@ -24,8 +24,8 @@ public class MongoAvroConverter extends KafkaAvroConverter {
   private static final String PAYLOAD_OPLOGFIELD = "payload";
   private static final String SOURCE_OPLOGFIELD = "source";
 
-  public MongoAvroConverter(StructType avroSchema) {
-    super(avroSchema);
+  public MongoAvroConverter(StructType avroSchema, String name) {
+    super(avroSchema, name);
   }
 
   @Override
