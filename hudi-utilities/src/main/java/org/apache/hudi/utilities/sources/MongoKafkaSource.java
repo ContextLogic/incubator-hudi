@@ -42,7 +42,7 @@ public class MongoKafkaSource extends AvroSource {
 
   private static final Logger LOG = LogManager.getLogger(MongoKafkaSource.class);
     
-  private volatile KafkaOffsetGen offsetGen;
+  private final KafkaOffsetGen offsetGen;
     
   private final SchemaProvider schemaProvider;
 
@@ -68,8 +68,8 @@ public class MongoKafkaSource extends AvroSource {
   }
 
   private JavaRDD<GenericRecord> toRDD(OffsetRange[] offsetRanges) {
-    String structName = schemaProvider.getSourceSchema().getName();
-    final KafkaAvroConverter converter = new MongoAvroConverter(AvroConversionUtils.convertAvroSchemaToStructType(schemaProvider.getSourceSchema()), structName);
+    final KafkaAvroConverter converter = new MongoAvroConverter(AvroConversionUtils.convertAvroSchemaToStructType(schemaProvider.getSourceSchema()),
+            schemaProvider.getSourceSchema().getName());
     return KafkaUtils.createRDD(sparkContext, offsetGen.getKafkaParams(), offsetRanges,
             LocationStrategies.PreferConsistent()).mapPartitions(converter::apply);
   }

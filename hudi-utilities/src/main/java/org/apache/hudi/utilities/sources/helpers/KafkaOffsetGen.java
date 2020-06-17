@@ -204,13 +204,6 @@ public class KafkaOffsetGen {
       toOffsets = consumer.endOffsets(topicPartitions);
     }
 
-    fromOffsets.entrySet().forEach(entry -> {
-      LOG.debug("fromOffsets: " + entry.getKey().topic() + "-" + entry.getKey().partition() + " -> " + entry.getValue());
-    });
-
-    toOffsets.entrySet().forEach(entry -> {
-      LOG.debug("toOffsets: " + entry.getKey().topic() + "-" + entry.getKey().partition() + " -> " + entry.getValue());
-    });
     // Come up with final set of OffsetRanges to read (account for new partitions, limit number of events)
     long maxEventsToReadFromKafka = props.getLong(Config.MAX_EVENTS_FROM_KAFKA_SOURCE_PROP,
         Config.maxEventsFromKafkaSource);
