@@ -133,7 +133,7 @@ public class SchemaUtils {
     Schema.Field field = schema.getField(fieldName);
     if (field == null) {
       for (Schema.Field item : schema.getFields()) {
-        for (String aliasName : field.aliases()) {
+        for (String aliasName : item.aliases()) {
           if (aliasName.equals(fieldName)) {
             field = item;
             break;
