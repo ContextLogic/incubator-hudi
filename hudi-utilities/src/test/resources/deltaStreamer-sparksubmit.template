@@ -1,0 +1,23 @@
+nohup spark-submit --conf spark.yarn.executor.memoryOverhead=6g \
+--conf spark.serializer=org.apache.spark.serializer.KryoSerializer \
+--conf spark.driver.extraLibraryPath=/usr/lib/hadoop/lib/native/ \
+--class org.apache.hudi.utilities.deltastreamer.HoodieDeltaStreamer \
+--deploy-mode cluster \
+--master yarn \
+--driver-memory 10g \
+--driver-cores 4 \
+--executor-memory 10g \
+--executor-cores 4 \
+hudi-utilities-bundle_2.11-0.5.2-incubating.jar \
+--props hdfs:///user/hudi/kafka-source.properties \
+--schemaprovider-class org.apache.hudi.utilities.schema.MongoSchemaProvider \
+--source-class org.apache.hudi.utilities.sources.MongoKafkaSource \
+--target-base-path s3_path \
+--target-table tmp.transactions \
+--table-type COPY_ON_WRITE \
+--payload-class org.apache.hudi.utilities.mongo.MongoAvroPayload \
+--source-ordering-field _ts_ms \
+--source-limit 10000 \
+--enable-hive-sync
+#--continuous \
+#--op BULK_INSERT
