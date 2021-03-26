@@ -30,6 +30,17 @@ public class TestMongoAvroConverter {
   }
 
   @Test
+  public void testStringDocumentId() throws IOException {
+    Schema.Parser parser = new Schema.Parser();
+    String sampleSchemaStr = readFile("unitTest/TestMongoAvroConverterSampleSchema_2.avsc");
+    String sampleKeyStr = readFile("unitTest/TestMongoAvroConverterSampleOplogKey_2.json");
+    Schema schema = parser.parse(sampleSchemaStr);
+    MongoAvroConverter transformer = new MongoAvroConverter(schema.toString());
+    String createSampleId = "WI001956021125FPL";
+    assertEquals(createSampleId, transformer.getDocumentId(sampleKeyStr));
+  }
+
+  @Test
   public void testKeyValueTransform() throws IOException {
     Schema.Parser parser = new Schema.Parser();
     String sampleSchemaStr = readFile("unitTest/TestMongoAvroConverterSampleSchema.avsc");
