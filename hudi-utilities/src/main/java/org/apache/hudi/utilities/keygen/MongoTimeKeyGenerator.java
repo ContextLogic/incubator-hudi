@@ -18,9 +18,13 @@
 
 package org.apache.hudi.utilities.keygen;
 
+import java.text.DateFormat;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Arrays;
+
+import com.esotericsoftware.minlog.Log;
 import org.apache.avro.generic.GenericRecord;
 import org.apache.hudi.DataSourceUtils;
 import org.apache.hudi.DataSourceWriteOptions;
@@ -39,6 +43,7 @@ public class MongoTimeKeyGenerator extends KeyGenerator {
   private static final String DATE_FORMAT_DEFAULT = "yyyy-MM-dd/HH";
   private static final String HIVE_DATE_FORMAT_DEFAULT = "'dt='yyyy-MM-dd'/hr='HH";
   private static final String RECORD_KEY = SchemaUtils.ID_FIELD;
+  private static final String RECORD_TIME = SchemaUtils.TS_MS_FIELD;
   private final boolean hiveStylePartitioning;
   private final SimpleDateFormat dateFormat;
   private final String outputDateFormat;
@@ -68,8 +73,18 @@ public class MongoTimeKeyGenerator extends KeyGenerator {
     if (recordKey == null) {
       throw new HoodieKeyException(SchemaUtils.ID_FIELD + " field value cannot be null");
     }
-    Date date = new ObjectId(recordKey).getDate();
-    String partitionPath = dateFormat.format(date);
-    return new HoodieKey(recordKey, partitionPath);
+    try {
+      Date date = new ObjectId(recordKey).getDate();
+      String partitionPath = dateFormat.format(date);
+      return new HoodieKey(recordKey, partitionPath);
+    }
+    catch (IllegalArgumentException iax){
+      String tsMs = DataSourceUtils.getNestedFieldValAsString(record, RECORD_TIME, true);
+      if (tsMs == null) {
+        throw new HoodieKeyException(SchemaUtils.TS_MS_FIELD + " field value cannot be null");
+      }
+      String partitionPath = dateFormat.format(new Date(Long.parseLong(tsMs)));
+      return new HoodieKey(recordKey, partitionPath);
+    }
   }
 }
