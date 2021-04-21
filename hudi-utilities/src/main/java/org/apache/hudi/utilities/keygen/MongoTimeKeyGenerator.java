@@ -20,7 +20,7 @@ package org.apache.hudi.utilities.keygen;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.Arrays;
+//import java.util.Arrays;
 import org.apache.avro.generic.GenericRecord;
 import org.apache.hudi.DataSourceUtils;
 import org.apache.hudi.DataSourceWriteOptions;
@@ -48,7 +48,7 @@ public class MongoTimeKeyGenerator extends KeyGenerator {
     private static final String TIMESTAMP_OUTPUT_DATE_FORMAT_PROP =
         "hoodie.deltastreamer.keygen.timebased.output.dateformat";
     private static final String HIVE_TIMESTAMP_OUTPUT_DATE_FORMAT_PROP =
-	"hoodie.deltastreamer.keygen.timebased.hive.output.dateformat";
+        "hoodie.deltastreamer.keygen.timebased.hive.output.dateformat";
   }
 
   public MongoTimeKeyGenerator(TypedProperties props) {
