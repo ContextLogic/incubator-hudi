@@ -32,7 +32,7 @@ public class MongoTimePartitionValueExtractor implements PartitionValueExtractor
   public MongoTimePartitionValueExtractor() {
   }
 
-  static private String partValue(String origVal) {
+  private static String partValue(String origVal) {
     String[] parts = origVal.split("=");
     return (parts.length > 1) ? parts[1] : parts[0];
   }
